@@ -6,6 +6,10 @@ import { currentUser } from "@/lib/server/session";
 export const runtime = "nodejs";
 const FIELDS = new Set(["age", "city", "countryCode", "profession", "education"]);
 
+function isInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value);
+}
+
 function validPreferenceSet(value: unknown): value is Record<string, unknown> {
   const serialized = JSON.stringify(value);
   if (!value || typeof value !== "object" || Array.isArray(value) || !serialized || serialized.length > 4000) return false;
@@ -14,10 +18,10 @@ function validPreferenceSet(value: unknown): value is Record<string, unknown> {
     if (field === "age") {
       if (!criterion || typeof criterion !== "object" || Array.isArray(criterion)) return false;
       const range = criterion as { min?: unknown; max?: unknown };
-      if (range.min !== undefined && (!Number.isInteger(range.min) || (range.min as number) < 18 || (range.min as number) > 100)) return false;
-      if (range.max !== undefined && (!Number.isInteger(range.max) || (range.max as number) < 18 || (range.max as number) > 100)) return false;
+      if (range.min !== undefined && (!isInteger(range.min) || range.min < 18 || range.min > 100)) return false;
+      if (range.max !== undefined && (!isInteger(range.max) || range.max < 18 || range.max > 100)) return false;
       if (range.min === undefined && range.max === undefined) return false;
-      if (range.min !== undefined && range.max !== undefined && (range.min as number) > (range.max as number)) return false;
+      if (range.min !== undefined && range.max !== undefined && range.min > range.max) return false;
       continue;
     }
     const values = Array.isArray(criterion) ? criterion : [criterion];
