@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     return jsonError(400, "INVALID_EDUCATION", "Education must be 160 characters or fewer.");
   }
   const visibility = body.visibility ?? {};
-  const visibilityKeys = new Set(["discoverable", "showAge", "showCity", "showProfession", "showEducation"]);
+  const visibilityKeys = new Set(["discoverable", "showAge", "showCity", "showProfession", "showEducation", "showCountryCode"]);
   const serializedVisibility = JSON.stringify(visibility);
   if (!visibility || typeof visibility !== "object" || Array.isArray(visibility) || !serializedVisibility || serializedVisibility.length > 1000) {
     return jsonError(400, "INVALID_VISIBILITY", "Profile visibility settings are invalid.");
