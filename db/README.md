@@ -4,12 +4,14 @@ Apply migrations in lexical order using a PostgreSQL database dedicated to the e
 
 1. `db/migrations/0001_core.sql`
 2. `db/migrations/0002_identity_consent_hardening.sql`
+3. `db/migrations/0003_contact_verification_discovery.sql`
 
 Example:
 
 ```bash
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_core.sql
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0002_identity_consent_hardening.sql
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0003_contact_verification_discovery.sql
 ```
 
 Run the migration regression script against a disposable database after both migrations:
