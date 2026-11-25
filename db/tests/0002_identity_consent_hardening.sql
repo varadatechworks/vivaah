@@ -62,6 +62,14 @@ BEGIN
     RAISE EXCEPTION 'Expected two historical generic consent grants';
   END IF;
 
+  BEGIN
+    INSERT INTO consent_record(user_id, purpose, scope, policy_version, source)
+    VALUES (test_user, 'profile_discovery', '{"discoverable":true}'::jsonb, 'test-v3', 'test');
+    RAISE EXCEPTION 'Expected duplicate active generic consent to fail';
+  EXCEPTION WHEN unique_violation THEN
+    NULL;
+  END;
+
   -- Invalid OTP counters must be rejected by database constraints.
   BEGIN
     INSERT INTO auth_otp_challenge(
