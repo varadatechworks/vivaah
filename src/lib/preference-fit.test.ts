@@ -24,6 +24,13 @@ describe("evaluatePreferenceFit", () => {
     expect(result.score).toBeNull();
   });
 
+  it("does not make a missing flexible field a hard eligibility failure", () => {
+    const result = evaluatePreferenceFit({}, { city: "Bengaluru" }, { city: null });
+    expect(result.eligible).toBe(true);
+    expect(result.score).toBeNull();
+    expect(result.unknownFields).toEqual(["city"]);
+  });
+
   it("scores flexible preferences using only visible comparable fields", () => {
     const result = evaluatePreferenceFit(
       {},
