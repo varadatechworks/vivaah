@@ -33,6 +33,14 @@ export async function POST(request: Request, context: { params: Promise<{ member
             SELECT 1 FROM consent_record c
              WHERE c.user_id = p.user_id AND c.purpose = 'profile_discovery' AND c.revoked_at IS NULL
           )
+          AND EXISTS (
+            SELECT 1 FROM member_profile mine
+             WHERE mine.user_id = $1 AND mine.lifecycle_state = 'active'
+          )
+          AND EXISTS (
+            SELECT 1 FROM consent_record own
+             WHERE own.user_id = $1 AND own.purpose = 'profile_discovery' AND own.revoked_at IS NULL
+          )
           AND NOT EXISTS (
             SELECT 1 FROM member_block b
              WHERE (b.blocker_user_id = $1 AND b.blocked_user_id = p.user_id)
