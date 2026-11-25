@@ -11,9 +11,10 @@ export async function GET() {
     const user = await currentUser();
     if (!user) return jsonError(401, "UNAUTHENTICATED", "Please sign in to view Social Connect settings.");
     const result = await query(
-      `SELECT category, purpose, policy_version, granted_at
+      `SELECT category, purpose, policy_version, granted_at, revoked_at,
+              (revoked_at IS NULL) AS enabled
          FROM social_share_consent
-        WHERE user_id = $1 AND revoked_at IS NULL ORDER BY category`,
+        WHERE user_id = $1 ORDER BY granted_at DESC LIMIT 200`,
       [user.id],
     );
     return jsonOk({ sharing: result.rows });
