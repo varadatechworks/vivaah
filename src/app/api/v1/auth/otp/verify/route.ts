@@ -21,6 +21,22 @@ export async function POST(request: Request) {
 
   try {
     const userId = await transaction(async client => {
+      const recentFailures = await client.query(
+        `SELECT COALESCE(sum(attempts), 0)::int AS count
+           FROM auth_otp_challenge
+          WHERE destination = $1 AND requested_at > now() - interval '15 minutes'`,
+        [email],
+      );
+      if ((recentFailures.rows[0]?.count ?? 0) >= 10) return null;
+      if (ipHash) {
+        const ipFailures = await client.query(
+          `SELECT count(*)::int AS count FROM auth_security_event
+            WHERE event_type = 'otp_failed' AND ip_hash = $1
+              AND occurred_at > now() - interval '15 minutes'`,
+          [ipHash],
+        );
+        if ((ipFailures.rows[0]?.count ?? 0) >= 20) return null;
+      }
       const challenge = await client.query(
         `SELECT id, code_hash, attempts, max_attempts
            FROM auth_otp_challenge
