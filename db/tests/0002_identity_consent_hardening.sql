@@ -48,6 +48,20 @@ BEGIN
     NULL;
   END;
 
+  -- Generic consent must preserve history and allow one active grant per scope.
+  INSERT INTO consent_record(user_id, purpose, scope, policy_version, source)
+  VALUES (test_user, 'profile_discovery', '{"discoverable":true}'::jsonb, 'test-v1', 'test');
+  UPDATE consent_record SET revoked_at = now()
+   WHERE user_id = test_user AND purpose = 'profile_discovery' AND revoked_at IS NULL;
+  INSERT INTO consent_record(user_id, purpose, scope, policy_version, source)
+  VALUES (test_user, 'profile_discovery', '{"discoverable":true}'::jsonb, 'test-v2', 'test');
+
+  IF (SELECT count(*) FROM consent_record
+       WHERE user_id = test_user AND purpose = 'profile_discovery'
+         AND scope = '{"discoverable":true}'::jsonb) <> 2 THEN
+    RAISE EXCEPTION 'Expected two historical generic consent grants';
+  END IF;
+
   -- Invalid OTP counters must be rejected by database constraints.
   BEGIN
     INSERT INTO auth_otp_challenge(
