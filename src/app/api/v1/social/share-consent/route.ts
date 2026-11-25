@@ -36,26 +36,36 @@ export async function PUT(request: Request) {
   try {
     const result = await transaction(async client => {
       if (body.enabled) {
+        const policyVersion = process.env.CONSENT_POLICY_VERSION || "v1";
+        await client.query(
+          "SELECT pg_advisory_xact_lock(hashtext($1))",
+          [`${user.id}:social_overlap:${body.category}`],
+        );
+        const existing = await client.query(
+          `SELECT id, category, granted_at FROM social_share_consent
+            WHERE user_id = $1 AND category = $2 AND purpose = 'match_overlap'
+              AND policy_version = $3 AND revoked_at IS NULL LIMIT 1`,
+          [user.id, body.category, policyVersion],
+        );
+        if (existing.rows[0]) return { enabled: true, consent: existing.rows[0] };
+
+        await client.query(
+          `UPDATE social_share_consent SET revoked_at = now()
+            WHERE user_id = $1 AND category = $2 AND purpose = 'match_overlap'
+              AND revoked_at IS NULL`,
+          [user.id, body.category],
+        );
         const inserted = await client.query(
           `INSERT INTO social_share_consent(user_id, category, purpose, policy_version)
            VALUES ($1, $2, 'match_overlap', $3)
-           ON CONFLICT (user_id, category, purpose) WHERE revoked_at IS NULL DO NOTHING
            RETURNING id, category, granted_at`,
-          [user.id, body.category, process.env.CONSENT_POLICY_VERSION || "v1"],
+          [user.id, body.category, policyVersion],
         );
-        if (inserted.rows[0]) {
-          await client.query(
-            "INSERT INTO auth_security_event(actor_user_id, subject_user_id, event_type, metadata) VALUES ($1, $1, 'consent_granted', $2)",
-            [user.id, { purpose: "social_overlap", category: body.category }],
-          );
-        }
-        const active = inserted.rows[0] ?? (await client.query(
-          `SELECT id, category, granted_at FROM social_share_consent
-            WHERE user_id = $1 AND category = $2 AND purpose = 'match_overlap'
-              AND revoked_at IS NULL LIMIT 1`,
-          [user.id, body.category],
-        )).rows[0];
-        return { enabled: true, consent: active };
+        await client.query(
+          "INSERT INTO auth_security_event(actor_user_id, subject_user_id, event_type, metadata) VALUES ($1, $1, 'consent_granted', $2)",
+          [user.id, { purpose: "social_overlap", category: body.category }],
+        );
+        return { enabled: true, consent: inserted.rows[0] };
       }
       const withdrawn = await client.query(
         `UPDATE social_share_consent SET revoked_at = now()
