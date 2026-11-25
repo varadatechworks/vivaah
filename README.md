@@ -7,9 +7,8 @@ Premium, privacy-first matrimonial platform. Product requirements and architectu
 1. Install Node.js 22 and PostgreSQL 14+.
 2. Install dependencies: `npm install`.
 3. Copy `.env.example` to `.env.local` and configure `DATABASE_URL`, `OTP_PEPPER`, `RESEND_API_KEY` and `AUTH_EMAIL_FROM`.
-4. Apply migrations in order using the instructions in `db/README.md`.
-5. Apply migrations 0001–0003 as described in `db/README.md`.
-6. Start the web app: `npm run dev`.
+4. Apply migrations 0001–0003 in order using the instructions in `db/README.md`.
+5. Start the web app: `npm run dev`.
 
 Useful checks:
 
