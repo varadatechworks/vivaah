@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       }
 
       const user = await client.query(
-        `UPDATE app_user SET status = 'active', updated_at = now()
+        `UPDATE app_user SET status = 'active', email_verified_at = COALESCE(email_verified_at, now()), last_authenticated_at = now(), updated_at = now()
           WHERE lower(email) = $1 AND status IN ('pending_verification', 'active')
           RETURNING id, email`,
         [email],
