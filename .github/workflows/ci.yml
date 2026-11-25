@@ -57,6 +57,7 @@ jobs:
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_core.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0002_identity_consent_hardening.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0003_contact_verification_discovery.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0004_member_safety.sql
       - name: Database regression tests
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/tests/0002_identity_consent_hardening.sql
       - name: Production build
