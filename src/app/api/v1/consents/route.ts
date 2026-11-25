@@ -31,7 +31,8 @@ export async function POST(request: Request) {
   if (typeof body.purpose !== "string" || !PURPOSES.has(body.purpose)) {
     return jsonError(400, "INVALID_PURPOSE", "Choose a supported consent purpose.");
   }
-  if (!body.scope || typeof body.scope !== "object" || Array.isArray(body.scope) || JSON.stringify(body.scope).length > 2000) {
+  const serializedScope = JSON.stringify(body.scope);
+  if (!body.scope || typeof body.scope !== "object" || Array.isArray(body.scope) || !serializedScope || serializedScope.length > 2000) {
     return jsonError(400, "INVALID_SCOPE", "The consent scope is invalid.");
   }
 
