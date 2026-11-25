@@ -37,6 +37,7 @@ The OTP is emailed through Resend and is never returned by the API. Production m
 - `GET|POST /api/v1/profile`
 - `GET /api/v1/profile/me`
 - `GET /api/v1/matches` (only active, discoverable profiles with active discovery consent)
+- `GET /api/v1/matches/:memberId` (visibility-gated candidate detail)
 - `POST /api/v1/matches/:memberId/feedback`
 - `GET /api/v1/matches/:memberId/social-overlap?category=pages`
 
