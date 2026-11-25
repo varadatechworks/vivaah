@@ -43,11 +43,16 @@ export async function POST(request: Request) {
         `SELECT id, purpose, scope, policy_version, granted_at
            FROM consent_record
           WHERE user_id = $1 AND purpose = $2 AND scope = $3::jsonb
-            AND revoked_at IS NULL
+            AND policy_version = $4 AND revoked_at IS NULL
           ORDER BY granted_at DESC LIMIT 1`,
-        [user.id, body.purpose, JSON.stringify(body.scope)],
+        [user.id, body.purpose, JSON.stringify(body.scope), policyVersion],
       );
       if (existing.rows[0]) return existing.rows[0];
+      await client.query(
+        `UPDATE consent_record SET revoked_at = now()
+          WHERE user_id = $1 AND purpose = $2 AND scope = $3::jsonb AND revoked_at IS NULL`,
+        [user.id, body.purpose, JSON.stringify(body.scope)],
+      );
       const inserted = await client.query(
         `INSERT INTO consent_record(user_id, purpose, scope, policy_version, actor_user_id, source)
          VALUES ($1, $2, $3::jsonb, $4, $1, 'member_settings')
