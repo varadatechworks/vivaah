@@ -37,6 +37,16 @@ Cookie-authenticated state changes require a matching same-origin Origin header.
 | POST | `/api/v1/social/connections/:provider/start` | Planned; requires official provider OAuth review and PKCE/state |
 | DELETE | `/api/v1/social/connections/:provider` | Planned; disconnect/revocation and imported-data deletion |
 
+## Member safety
+
+| Method | Endpoint | State |
+|---|---|---|
+| POST | `/api/v1/members/:memberId/block` | Implemented: owner-scoped, idempotent block |
+| DELETE | `/api/v1/members/:memberId/block` | Implemented: unblock own block record |
+| POST | `/api/v1/members/:memberId/report` | Implemented: category-validated report submission with account-level daily cap |
+
+Reports are persisted in a moderation queue. Admin review, member notification, appeals and case-management workflows are not yet implemented.
+
 ## Match discovery
 
 - GET `/api/v1/matches` — implemented consent-gated candidate discovery; only active, discoverable profiles with active discovery consent are returned, with visibility-aware fields. Match scores remain null until the dimension engines are integrated.
