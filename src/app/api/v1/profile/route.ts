@@ -63,8 +63,12 @@ export async function POST(request: Request) {
     return jsonError(400, "INVALID_EDUCATION", "Education must be 160 characters or fewer.");
   }
   const visibility = body.visibility ?? {};
+  const visibilityKeys = new Set(["discoverable", "showAge", "showCity", "showProfession", "showEducation"]);
   if (!visibility || typeof visibility !== "object" || Array.isArray(visibility) || JSON.stringify(visibility).length > 1000) {
     return jsonError(400, "INVALID_VISIBILITY", "Profile visibility settings are invalid.");
+  }
+  if (Object.entries(visibility).some(([key, value]) => !visibilityKeys.has(key) || typeof value !== "boolean")) {
+    return jsonError(400, "INVALID_VISIBILITY", "Use supported visibility options with true or false values.");
   }
 
   try {
