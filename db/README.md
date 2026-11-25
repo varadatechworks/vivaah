@@ -14,7 +14,7 @@ psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0002_identity_consent_h
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0003_contact_verification_discovery.sql
 ```
 
-Run the migration regression script against a disposable database after both migrations:
+Run the migration regression script against a disposable database after migrations 0001 and 0002 (it remains compatible after 0003):
 
 ```bash
 psql "$TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -f db/tests/0002_identity_consent_hardening.sql
