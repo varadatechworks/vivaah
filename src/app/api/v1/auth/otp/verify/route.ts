@@ -38,7 +38,7 @@ export async function POST(request: Request) {
         await client.query("UPDATE auth_otp_challenge SET attempts = attempts + 1 WHERE id = $1", [row.id]);
         await client.query(
           `UPDATE auth_otp_challenge SET invalidated_at = now()
-            WHERE id = $1 AND attempts + 1 >= max_attempts`,
+            WHERE id = $1 AND attempts >= max_attempts`,
           [row.id],
         );
         await client.query(
@@ -57,6 +57,10 @@ export async function POST(request: Request) {
       if (!user.rows[0]) return null;
 
       await client.query("UPDATE auth_otp_challenge SET consumed_at = now() WHERE id = $1", [row.id]);
+      await client.query(
+        "INSERT INTO auth_security_event(actor_user_id, subject_user_id, event_type, ip_hash, metadata) VALUES ($1, $1, 'otp_verified', $2, $3)",
+        [user.rows[0].id, ipHash, { purpose: "sign_in" }],
+      );
       await client.query(
         `INSERT INTO auth_session(user_id, token_hash, expires_at, ip_hash, user_agent_hash)
          VALUES ($1, $2, now() + interval '7 days', $3, $4)`,
