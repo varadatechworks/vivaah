@@ -14,11 +14,13 @@ Snapshot: 2026-11-25. Status reflects committed source, not production deploymen
 | OTP verification | Implemented in source | Constant-time digest comparison, per-challenge and aggregate email/IP attempt caps, atomic challenge consumption, email verification timestamp and hashed session creation |
 | Sessions | Implemented in source | HttpOnly cookie, SHA-256 token digest, expiry/revocation validation, logout |
 | Authentication hardening | Partial | Same-origin Origin enforcement, SameSite/HttpOnly cookies, email/IP rate caps and security audit events; recovery, session/device management and penetration testing remain |
-| Profile API | Implemented in source | Authenticated own-profile read/write, field validation and minimum-age rule; lifecycle moderation and completion workflow pending |
+| Profile API | Implemented in source | Authenticated own-profile read/write, field validation, 18+ rule and per-field visibility controls; lifecycle moderation and completion workflow pending |
+| Preference API | Implemented in source | Allow-listed must-have/flexible age, city, country, profession and education criteria |
+| Preference fit | Domain helper + unit tests committed | Must-have mismatches excluded; hidden/unavailable fields remain unknown; flexible score uses comparable visible fields |
 | Generic consent API | Implemented in source | Allow-listed purposes, scope receipts, history and owner-only withdrawal |
 | Social category consent | Implemented in source | Per-category grant/withdraw, active-only uniqueness and security audit events; downstream deletion jobs pending |
 | Social overlap API | Implemented in source | Requires mutual category consent, active candidate profile and no block either way; real provider ingestion and integration tests pending |
-| Candidate discovery API | Implemented in source | Returns only active profiles with discovery consent and explicit discoverability; fields are visibility-gated; ranking engine not integrated |
+| Candidate discovery API | Implemented in source | Returns only active profiles with discovery consent and explicit discoverability; visibility-gated fields and preference fit are applied; remaining dimensions not integrated |
 | Match detail API | Implemented in source | Visibility-gated profile projection after active-profile, discovery-consent and bidirectional block checks |
 | Match feedback API | Implemented in source | Authenticated viewed/shortlisted/interested/passed events with candidate eligibility and block checks |
 | Member blocking | Implemented in source | Authenticated block/unblock operations; discovery and match detail respect either-direction blocks |
