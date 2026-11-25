@@ -27,7 +27,7 @@ Snapshot: 2026-11-25. Status reflects committed source, not production deploymen
 | CI workflow | Committed | Lint, typecheck, unit tests, PostgreSQL 16 migrations/regression test and production build configured; workflow result not yet observed |
 | Social providers | Not implemented | Official provider app review, approved scopes, OAuth adapters and deletion lifecycle required |
 | Horoscope / AI / values | Not implemented | Domain engines, user controls and privacy review required; Values must remain self-declared |
-| Match discovery / messaging | Not implemented | Candidate APIs, interest state machine, chat, abuse prevention and notifications required |
+| Match ranking / messaging | Not implemented | Dimension-specific ranking integration, interest state machine, chat, abuse prevention and notifications required |
 | Family Connect | Not implemented | Family permissions, member privacy and controlled invitation workflow required |
 | Payments/subscriptions | Not implemented | Gateway integration, idempotency, ledger, refunds and reconciliation required |
 | Admin/moderation/safety | Not implemented | RBAC, verification, reporting, blocking, appeals and audit console required |
@@ -40,7 +40,7 @@ Snapshot: 2026-11-25. Status reflects committed source, not production deploymen
 2. Configure Resend sender verification and strong secrets; run OTP request/verify/logout negative tests.
 3. Execute CI and fix all lint, type, unit-test and build failures.
 4. Add CSRF defense appropriate to the deployment topology, robust rate limiting, account recovery and session management.
-5. Implement profile completion/moderation, matching discovery and provider OAuth only after reviewing official scopes and terms.
+5. Implement profile completion/moderation, dimension ranking and provider OAuth only after reviewing official scopes and terms.
 6. Complete privacy impact review, retention/deletion workflows, security testing and operational monitoring.
 
 Do not report production readiness or a completion percentage until CI, database, API, E2E, mobile and security evidence exists. A committed implementation is not the same as a verified running feature.
