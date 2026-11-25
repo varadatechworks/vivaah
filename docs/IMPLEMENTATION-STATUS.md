@@ -1,29 +1,44 @@
 # Implementation status
 
-Snapshot: 2026-11-25
+Snapshot: 2026-11-25. Status reflects committed source, not production deployment.
 
 | Area | State | Evidence / gap |
 |---|---|---|
 | Product BRD | Baseline | Five dimensions and Social Connect privacy requirements documented |
-| Architecture | Baseline | Domain/security boundaries documented; full threat model pending |
-| Premium web | UI prototype committed | Next.js responsive editorial design; no backend integration |
-| Social Connect web | UI prototype committed | Selectable fictional overlap counts and item lists; no live provider connection |
-| Mobile | Expo UI starter committed | Five tabs and Social Connect sample; no API/auth/device QA |
-| Health endpoint | Prototype | GET /api/health returns service status; not an infrastructure readiness probe |
-| Match aggregation | Domain helper | Consent-aware weighted aggregation; unit assertions run locally; API integration pending |
-| Social overlap | Domain helper | Requires mutual category consent; local assertions run; provider adapters pending |
-| Core relational schema | Baseline migration committed | User/profile/consent/social entities and indexes; database migration not yet applied |
-| Identity/session schema | Migration committed | OTP challenge, hashed opaque session, security-event tables and indexes; runtime auth not implemented |
-| Social consent lifecycle | Migration committed | Active-only unique index permits withdrawal and later re-grant while retaining history; SQL regression script added but not executed against PostgreSQL |
-| Identity security design | Documented | OTP/session/CSRF/rate-limit/consent controls and sensitive-inference boundaries documented |
-| Auth/consent APIs | Not implemented | Provider delivery, transactional verification, session middleware and authenticated routes required |
-| Profile/discovery backend | Not implemented | API, validation and authorization required |
-| Social providers | Not implemented | Official provider app review, scopes and adapters required |
-| Horoscope / AI / values | Not implemented | Domain engines and privacy review required; Values must remain self-declared |
-| Payments/admin/safety | Not implemented | Ledger, moderation, RBAC and audit required |
-| Automated tests | Partial foundation | SQL regression script committed; DB execution, unit/integration/e2e/accessibility/negative tests pending |
-| Build/device verification | Not verified | Dependency install, Next build, Expo device QA and deployment checks not run |
+| Architecture | Baseline | Domain/security boundaries documented; full threat model and DPIA pending |
+| Premium web | UI prototype committed | Responsive editorial UI; not yet wired to real APIs |
+| Social Connect web | UI prototype committed | Illustrative overlap counts only; no real provider connection |
+| Mobile | Expo UI starter committed | Five tabs; no auth/API integration or device QA |
+| PostgreSQL client | Implemented in source | Pooled server client and transaction helper; database not provisioned or connected |
+| OTP request | Implemented in source | Six-digit CSPRNG OTP, HMAC digest, five-minute expiry, resend invalidation, destination/IP rate checks, Resend delivery adapter |
+| OTP verification | Implemented in source | Constant-time digest comparison, attempt counter, atomic challenge consumption, hashed session creation |
+| Sessions | Implemented in source | HttpOnly cookie, SHA-256 token digest, expiry/revocation validation, logout |
+| Authentication hardening | Partial | Same-origin checks on cookie writes and no-store responses; CSRF strategy, abuse controls, device/session management and penetration testing remain |
+| Profile API | Implemented in source | Authenticated own-profile read/write, field validation and minimum-age rule; lifecycle moderation and completion workflow pending |
+| Generic consent API | Implemented in source | Allow-listed purposes, scope receipts, history and owner-only withdrawal |
+| Social category consent | Implemented in source | Per-category grant/withdraw and active-only uniqueness; audit events and downstream deletion jobs pending |
+| Social overlap API | Implemented in source | Requires mutual category consent, active candidate profile and no block either way; real provider ingestion and integration tests pending |
+| Matching engine | Domain helper + unit tests committed | Weighted consent-aware aggregation; no database discovery/ranking integration |
+| Social overlap helper | Domain helper + unit tests committed | Mutual consent and de-duplication tests committed |
+| Database schema | Migrations committed | Core, identity/session and consent lifecycle schemas; migrations not applied or PostgreSQL-tested |
+| Liveness/readiness | Implemented in source | /api/health and DB/config-aware /api/ready; not exercised in deployment |
+| CI workflow | Committed | Lint, typecheck, unit tests and production build configured; workflow result not yet observed |
+| Social providers | Not implemented | Official provider app review, approved scopes, OAuth adapters and deletion lifecycle required |
+| Horoscope / AI / values | Not implemented | Domain engines, user controls and privacy review required; Values must remain self-declared |
+| Match discovery / messaging | Not implemented | Candidate APIs, interest state machine, chat, abuse prevention and notifications required |
+| Family Connect | Not implemented | Family permissions, member privacy and controlled invitation workflow required |
+| Payments/subscriptions | Not implemented | Gateway integration, idempotency, ledger, refunds and reconciliation required |
+| Admin/moderation/safety | Not implemented | RBAC, verification, reporting, blocking, appeals and audit console required |
+| Automated tests | Partial foundation | Unit tests and SQL regression script committed; no executed CI, DB integration, API, E2E, accessibility or security tests yet |
+| Build/device verification | Not verified | Dependencies not installed in this environment; Next build, Expo build and Android/iOS device QA not run |
 
-## Evidence and release rule
+## Immediate release blockers
 
-Do not report production readiness or a completion percentage until migrations have been applied in a disposable test database, runtime APIs are integrated, and automated build/test/security evidence is available. A committed migration or test script is not equivalent to a successfully executed test.
+1. Configure a real PostgreSQL database, apply migrations 0001 and 0002, and run the SQL regression script.
+2. Configure Resend sender verification and strong secrets; run OTP request/verify/logout negative tests.
+3. Execute CI and fix all lint, type, unit-test and build failures.
+4. Add CSRF defense appropriate to the deployment topology, robust rate limiting, account recovery and session management.
+5. Implement profile completion/moderation, matching discovery and provider OAuth only after reviewing official scopes and terms.
+6. Complete privacy impact review, retention/deletion workflows, security testing and operational monitoring.
+
+Do not report production readiness or a completion percentage until CI, database, API, E2E, mobile and security evidence exists. A committed implementation is not the same as a verified running feature.
