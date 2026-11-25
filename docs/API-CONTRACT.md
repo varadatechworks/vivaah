@@ -40,7 +40,7 @@ Cookie-authenticated state changes require a matching same-origin Origin header.
 ## Match discovery
 
 - GET `/api/v1/matches` — implemented consent-gated candidate discovery; only active, discoverable profiles with active discovery consent are returned, with visibility-aware fields. Match scores remain null until the dimension engines are integrated.
-- GET `/api/v1/matches/:memberId` — planned match detail after privacy, block and eligibility checks.
+- GET `/api/v1/matches/:memberId` — implemented visibility-gated detail after active-profile, discovery-consent and bidirectional block checks.
 - POST `/api/v1/matches/:memberId/feedback` — implemented viewed, shortlisted, interested and passed events, subject to candidate eligibility and block checks.
 
 ## Contract and privacy rules
