@@ -26,6 +26,7 @@ export async function POST(request: Request) {
   try {
     const eligible = await transaction(async client => {
       await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [email]);
+      if (ipHash) await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [ipHash.toString("hex")]);
       const rate = await client.query(
         `SELECT count(*)::int AS count FROM auth_otp_challenge
           WHERE destination = $1 AND requested_at > now() - interval '15 minutes'`,
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
         [email],
       );
       const user = await client.query(
-        "SELECT status FROM app_user WHERE lower(email) = $1",
+        "SELECT id, status FROM app_user WHERE lower(email) = $1",
         [email],
       );
       if (!user.rows[0] || ["suspended", "deleted", "deletion_requested"].includes(user.rows[0].status)) return false;
@@ -62,6 +63,10 @@ export async function POST(request: Request) {
           (id, channel, destination, code_hash, purpose, max_attempts, expires_at, request_ip_hash, request_user_agent_hash)
          VALUES ($1, 'email', $2, $3, 'sign_in', 5, now() + interval '5 minutes', $4, $5)`,
         [challengeId, email, hashOtp(otp, email, challengeId), ipHash, agentHash],
+      );
+      await client.query(
+        "INSERT INTO auth_security_event(subject_user_id, event_type, ip_hash, metadata) VALUES ($1, 'otp_requested', $2, $3)",
+        [user.rows[0].id, ipHash, { purpose: "sign_in" }],
       );
       return true;
     });
