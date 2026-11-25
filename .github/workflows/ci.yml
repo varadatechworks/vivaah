@@ -1,0 +1,42 @@
+name: Vivaah CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vivaah-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+        env:
+          DATABASE_URL: postgres://vivaah:ci-only@127.0.0.1:5432/vivaah
+          OTP_PEPPER: ci-only-secret-not-used-for-real-authentication-000000
+          RESEND_API_KEY: re_ci_placeholder
+          AUTH_EMAIL_FROM: Vivaah CI <ci@example.invalid>
