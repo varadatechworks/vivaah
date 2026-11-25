@@ -21,9 +21,11 @@ Snapshot: 2026-11-25. Status reflects committed source, not production deploymen
 | Candidate discovery API | Implemented in source | Returns only active profiles with discovery consent and explicit discoverability; fields are visibility-gated; ranking engine not integrated |
 | Match detail API | Implemented in source | Visibility-gated profile projection after active-profile, discovery-consent and bidirectional block checks |
 | Match feedback API | Implemented in source | Authenticated viewed/shortlisted/interested/passed events with candidate eligibility and block checks |
+| Member blocking | Implemented in source | Authenticated block/unblock operations; discovery and match detail respect either-direction blocks |
+| Member reporting | Implemented in source | Category-validated reports persisted to moderation queue with account daily cap; admin case management pending |
 | Matching engine | Domain helper + unit tests committed | Weighted consent-aware aggregation; no database discovery/ranking integration |
 | Social overlap helper | Domain helper + unit tests committed | Mutual consent and de-duplication tests committed |
-| Database schema | Migrations committed | Core, identity/session, contact verification and consent lifecycle schemas; CI migration execution not yet observed |
+| Database schema | Migrations committed | Core, identity/session, contact verification, consent lifecycle and member safety schemas; CI migration execution not yet observed |
 | Liveness/readiness | Implemented in source | /api/health and DB/config-aware /api/ready; not exercised in deployment |
 | CI workflow | Committed | Lint, typecheck, unit tests, PostgreSQL 16 migrations/regression test and production build configured; workflow result not yet observed |
 | Social providers | Not implemented | Official provider app review, approved scopes, OAuth adapters and deletion lifecycle required |
@@ -37,7 +39,7 @@ Snapshot: 2026-11-25. Status reflects committed source, not production deploymen
 
 ## Immediate release blockers
 
-1. Configure a real PostgreSQL database, apply migrations 0001–0003, and run the SQL regression script.
+1. Configure a real PostgreSQL database, apply migrations 0001–0004, and run the SQL regression script.
 2. Configure Resend sender verification and strong secrets; run OTP request/verify/logout negative tests.
 3. Execute CI and fix all lint, type, unit-test and build failures.
 4. Add CSRF defense appropriate to the deployment topology, robust rate limiting, account recovery and session management.
