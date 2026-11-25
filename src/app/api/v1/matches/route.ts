@@ -40,7 +40,7 @@ export async function GET(request: Request) {
               p.display_name,
               CASE WHEN p.visibility->>'showAge' = 'true' AND p.date_of_birth IS NOT NULL
                 THEN date_part('year', age(current_date, p.date_of_birth))::int ELSE NULL END AS age,
-              CASE WHEN p.visibility->>'showCity' = 'true' THEN p.city ELSE NULL END AS city,
+              CASE WHEN p.visibility->>'showCity' = 'true' THEN p.city ELSE NULL END AS city,\n              CASE WHEN p.visibility->>'showCountryCode' = 'true' THEN p.country_code ELSE NULL END AS country_code,
               CASE WHEN p.visibility->>'showProfession' = 'true' THEN p.profession ELSE NULL END AS profession,
               CASE WHEN p.visibility->>'showEducation' = 'true' THEN p.education ELSE NULL END AS education,
               p.updated_at
