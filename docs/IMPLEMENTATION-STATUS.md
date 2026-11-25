@@ -4,17 +4,18 @@ Snapshot: 2026-11-25
 | Area | State | Evidence / gap |
 |---|---|---|
 | Product BRD | Baseline | Five dimensions and Social Connect privacy requirements documented |
-| Architecture | Baseline | Domain/security boundaries documented; detailed threat model pending |
-| Premium web | UI prototype | Next.js landing and discovery preview; no backend |
-| Social Connect | UI prototype | Fictional overlap counts; no live social provider integration |
-| Mobile | UI starter | Expo screen; no API/auth/device QA |
-| Auth/consent | Not implemented | Identity, session, consent ledger required |
+| Architecture | Baseline | Domain/security boundaries documented; threat model pending |
+| Premium web | UI prototype committed | Next.js responsive editorial design; no backend integration |
+| Social Connect web | UI prototype committed | Selectable fictional overlap counts and item lists; no live provider connection |
+| Mobile | Expo UI starter committed | Five tabs and Social Connect sample; no API/auth/device QA |
+| Health endpoint | Prototype | GET /api/health returns service status; not an infrastructure readiness probe |
+| Match aggregation | Domain helper | Consent-aware weighted aggregation; tests and API integration pending |
+| Social overlap | Domain helper | Requires mutual category consent; provider adapters and tests pending |
+| Auth/consent | Not implemented | Identity, sessions and durable consent ledger required |
 | Profile/discovery backend | Not implemented | Schema, API, validation and authorization required |
-| Matching services | Not implemented | Deterministic eligibility and scoring required |
-| Social provider integrations | Not implemented | API capability and app-review work required |
-| Horoscope | Not implemented | Calculation source and regional rules required |
-| AI Compatibility | Not implemented | Consent-minimized engine and evaluation required |
+| Social providers | Not implemented | Developer review and official scopes required |
+| Horoscope / AI / values | Not implemented | Domain engines and privacy review required |
 | Payments/admin/safety | Not implemented | Ledger, moderation, RBAC and audit required |
 | Automated tests | Not implemented | Unit, integration, e2e, accessibility and negative tests required |
 
-No production-readiness or percentage claim until integration and test evidence exists.
+Do not report production readiness or a percentage until integration and test evidence exists.
