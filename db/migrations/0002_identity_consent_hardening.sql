@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS auth_otp_challenge (
   invalidated_at timestamptz,
   request_ip_hash bytea,
   request_user_agent_hash bytea,
+  CHECK (attempts <= max_attempts),
   CHECK (expires_at > requested_at),
   CHECK (consumed_at IS NULL OR consumed_at >= requested_at),
   CHECK (invalidated_at IS NULL OR invalidated_at >= requested_at)
