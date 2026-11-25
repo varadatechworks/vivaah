@@ -1,4 +1,4 @@
-import { Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
+import { Pool, type PoolClient } from "pg";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -8,9 +8,10 @@ declare global {
 function createPool(): Pool {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error("DATABASE_URL is not configured");
+  const configuredMax = Number(process.env.DB_POOL_MAX ?? 5);
   return new Pool({
     connectionString,
-    max: Number(process.env.DB_POOL_MAX ?? 5),
+    max: Number.isInteger(configuredMax) && configuredMax > 0 ? Math.min(configuredMax, 20) : 5,
     idleTimeoutMillis: 10_000,
     connectionTimeoutMillis: 5_000,
     ssl: process.env.DATABASE_SSL === "disable" ? false : { rejectUnauthorized: true },
@@ -23,11 +24,12 @@ export function db(): Pool {
   return globalThis.vivaahPgPool;
 }
 
-export async function query<T extends QueryResultRow = QueryResultRow>(
+export async function query<T = Record<string, unknown>>(
   text: string,
   values: unknown[] = [],
-): Promise<QueryResult<T>> {
-  return db().query<T>(text, values);
+): Promise<{ rows: T[]; rowCount: number | null }> {
+  const result = await db().query(text, values as never[]);
+  return { rows: result.rows as T[], rowCount: result.rowCount };
 }
 
 export async function transaction<T>(work: (client: PoolClient) => Promise<T>): Promise<T> {
