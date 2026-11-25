@@ -64,7 +64,8 @@ export async function POST(request: Request) {
   }
   const visibility = body.visibility ?? {};
   const visibilityKeys = new Set(["discoverable", "showAge", "showCity", "showProfession", "showEducation"]);
-  if (!visibility || typeof visibility !== "object" || Array.isArray(visibility) || JSON.stringify(visibility).length > 1000) {
+  const serializedVisibility = JSON.stringify(visibility);
+  if (!visibility || typeof visibility !== "object" || Array.isArray(visibility) || !serializedVisibility || serializedVisibility.length > 1000) {
     return jsonError(400, "INVALID_VISIBILITY", "Profile visibility settings are invalid.");
   }
   if (Object.entries(visibility).some(([key, value]) => !visibilityKeys.has(key) || typeof value !== "boolean")) {
