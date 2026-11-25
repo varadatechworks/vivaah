@@ -26,6 +26,7 @@ export async function POST(request: Request) {
 
   try {
     const eligible = await transaction(async client => {
+      await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [email]);
       const rate = await client.query(
         `SELECT count(*)::int AS count FROM auth_otp_challenge
           WHERE destination = $1 AND requested_at > now() - interval '15 minutes'`,
