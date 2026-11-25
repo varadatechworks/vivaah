@@ -20,6 +20,9 @@ OTP requests accept `{ "email": "member@example.com" }`; verification accepts `{
 | GET | `/api/v1/profile` | Implemented: own profile projection |
 | POST | `/api/v1/profile` | Implemented: validated create/update; 18+ date-of-birth rule |
 | GET | `/api/v1/profile/me` | Implemented alias |
+| GET | `/api/v1/preferences` | Implemented: own must-have and flexible criteria |
+| PUT | `/api/v1/preferences` | Implemented: allow-listed age, city, country, profession and education criteria |
+
 | GET | `/api/v1/consents` | Implemented: current and historical receipts |
 | POST | `/api/v1/consents` | Implemented: purpose/scope grant with policy version |
 | POST | `/api/v1/consents/:id/withdraw` | Implemented: owner-only withdrawal |
