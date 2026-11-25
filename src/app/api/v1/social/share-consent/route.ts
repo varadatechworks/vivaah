@@ -42,6 +42,12 @@ export async function PUT(request: Request) {
            RETURNING id, category, granted_at`,
           [user.id, body.category, process.env.CONSENT_POLICY_VERSION || "v1"],
         );
+        if (inserted.rows[0]) {
+          await client.query(
+            "INSERT INTO auth_security_event(actor_user_id, subject_user_id, event_type, metadata) VALUES ($1, $1, 'consent_granted', $2)",
+            [user.id, { purpose: "social_overlap", category: body.category }],
+          );
+        }
         const active = inserted.rows[0] ?? (await client.query(
           `SELECT id, category, granted_at FROM social_share_consent
             WHERE user_id = $1 AND category = $2 AND purpose = 'match_overlap'
@@ -56,6 +62,12 @@ export async function PUT(request: Request) {
           RETURNING id, category, revoked_at`,
         [user.id, body.category],
       );
+      if (withdrawn.rowCount) {
+        await client.query(
+          "INSERT INTO auth_security_event(actor_user_id, subject_user_id, event_type, metadata) VALUES ($1, $1, 'consent_withdrawn', $2)",
+          [user.id, { purpose: "social_overlap", category: body.category }],
+        );
+      }
       return { enabled: false, withdrawn: withdrawn.rows };
     });
     return jsonOk(result);
