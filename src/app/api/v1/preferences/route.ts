@@ -7,7 +7,8 @@ export const runtime = "nodejs";
 const FIELDS = new Set(["age", "city", "countryCode", "profession", "education"]);
 
 function validPreferenceSet(value: unknown): value is Record<string, unknown> {
-  if (!value || typeof value !== "object" || Array.isArray(value) || JSON.stringify(value).length > 4000) return false;
+  const serialized = JSON.stringify(value);
+  if (!value || typeof value !== "object" || Array.isArray(value) || !serialized || serialized.length > 4000) return false;
   for (const [field, criterion] of Object.entries(value)) {
     if (!FIELDS.has(field)) return false;
     if (field === "age") {
