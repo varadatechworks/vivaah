@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { transaction } from "@/lib/server/db";
-import { jsonError, jsonOk, clientIp } from "@/lib/server/http";
+import { jsonError, clientIp } from "@/lib/server/http";
 import { hashSessionToken, newSessionToken, normalizeEmail, requestFingerprint, validOtp, verifyOtp } from "@/lib/server/security";
 import { COOKIE_NAME, sessionCookieOptions } from "@/lib/server/session";
 
