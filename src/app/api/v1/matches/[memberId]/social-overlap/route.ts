@@ -33,9 +33,27 @@ export async function GET(
       `SELECT 1
          FROM app_user u
          JOIN member_profile p ON p.user_id = u.id
-        WHERE u.id = $1 AND u.status = 'active' AND p.lifecycle_state = 'active'
+        WHERE u.id = $1 AND u.status = 'active'
+          AND p.lifecycle_state = 'active'
+          AND p.visibility->>'discoverable' = 'true'
+          AND EXISTS (
+            SELECT 1 FROM member_profile mine
+             WHERE mine.user_id = $2 AND mine.lifecycle_state = 'active'
+          )
+          AND EXISTS (
+            SELECT 1 FROM consent_record candidate_consent
+             WHERE candidate_consent.user_id = u.id
+               AND candidate_consent.purpose = 'profile_discovery'
+               AND candidate_consent.revoked_at IS NULL
+          )
+          AND EXISTS (
+            SELECT 1 FROM consent_record viewer_consent
+             WHERE viewer_consent.user_id = $2
+               AND viewer_consent.purpose = 'profile_discovery'
+               AND viewer_consent.revoked_at IS NULL
+          )
         LIMIT 1`,
-      [memberId],
+      [memberId, viewer.id],
     );
     if (!eligible.rowCount) return jsonError(404, "MATCH_NOT_FOUND", "This match is not available.");
 
