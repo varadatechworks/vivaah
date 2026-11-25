@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS member_report (
 
 CREATE INDEX IF NOT EXISTS member_report_queue_idx
   ON member_report(status, created_at ASC);
+CREATE INDEX IF NOT EXISTS member_report_reporter_idx
+  ON member_report(reporter_user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS member_report_subject_idx
   ON member_report(reported_user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS member_block_target_idx
