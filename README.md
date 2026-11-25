@@ -40,6 +40,8 @@ The OTP is emailed through Resend and is never returned by the API. Production m
 - `GET /api/v1/matches/:memberId` (visibility-gated candidate detail)
 - `POST /api/v1/matches/:memberId/feedback`
 - `GET /api/v1/matches/:memberId/social-overlap?category=pages`
+- `POST|DELETE /api/v1/members/:memberId/block`
+- `POST /api/v1/members/:memberId/report`
 
 Cookie-authenticated writes require a same-origin Origin header. Responses are no-store. Profile creation enforces an 18+ date-of-birth check. Social overlap requires both members to consent for the exact category, active candidate profile eligibility, and no block in either direction.
 
