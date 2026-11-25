@@ -36,7 +36,7 @@ export function hashSessionToken(token: string): Buffer {
 
 export function requestFingerprint(value: string | null): Buffer | null {
   if (!value) return null;
-  return createHash("sha256").update(value).digest();
+  return createHmac("sha256", pepper()).update(value).digest();
 }
 
 export function validOtp(value: unknown): value is string {
