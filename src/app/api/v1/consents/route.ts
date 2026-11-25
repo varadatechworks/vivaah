@@ -39,6 +39,8 @@ export async function POST(request: Request) {
   const policyVersion = process.env.CONSENT_POLICY_VERSION || "v1";
   try {
     const receipt = await transaction(async client => {
+      const lockKey = [user.id, body.purpose, serializedScope].join(":");
+      await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [lockKey]);
       const existing = await client.query(
         `SELECT id, purpose, scope, policy_version, granted_at
            FROM consent_record
