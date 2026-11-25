@@ -15,6 +15,10 @@ CREATE UNIQUE INDEX IF NOT EXISTS social_share_consent_one_active_idx
 CREATE INDEX IF NOT EXISTS social_share_consent_history_idx
   ON social_share_consent(user_id, category, purpose, granted_at DESC);
 
+CREATE UNIQUE INDEX IF NOT EXISTS consent_one_active_scope_idx
+  ON consent_record(user_id, purpose, scope)
+  WHERE revoked_at IS NULL;
+
 -- OTP challenges store only a one-way code hash. Delivery is handled by a
 -- provider adapter; raw OTPs must never be persisted or logged.
 CREATE TABLE IF NOT EXISTS auth_otp_challenge (
