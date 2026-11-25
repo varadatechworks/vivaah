@@ -1,6 +1,7 @@
 import { query } from "@/lib/server/db";
 import { jsonError, jsonOk } from "@/lib/server/http";
 import { currentUser } from "@/lib/server/session";
+import { evaluatePreferenceFit, type PreferenceSet } from "@/lib/preference-fit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,6 +36,13 @@ export async function GET(request: Request) {
       return jsonOk({ matches: [], limit, offset, hasMore: false, reason: "Enable profile discovery consent to see eligible members." });
     }
 
+    const savedPreferences = await query(
+      "SELECT must_have, flexible FROM partner_preference WHERE user_id = $1 LIMIT 1",
+      [viewer.id],
+    );
+    const mustHave = (savedPreferences.rows[0]?.must_have ?? {}) as PreferenceSet;
+    const flexible = (savedPreferences.rows[0]?.flexible ?? {}) as PreferenceSet;
+
     const candidates = await query(
       `SELECT p.user_id AS member_id,
               p.display_name,
@@ -66,17 +74,27 @@ export async function GET(request: Request) {
       [viewer.id, limit + 1, offset],
     );
     const hasMore = candidates.rows.length > limit;
-    const matches = candidates.rows.slice(0, limit).map(row => ({
-      ...row,
-      matchScore: null,
-      dimensions: {
-        preference: "not_calculated",
-        horoscope: "not_calculated",
-        social: "requires_mutual_category_consent",
-        aiCompatibility: "not_calculated",
-        values: "not_calculated",
-      },
-    }));
+    const matches = candidates.rows.slice(0, limit).map(row => {
+      const preferenceFit = evaluatePreferenceFit(mustHave, flexible, {
+        age: typeof row.age === "number" ? row.age : null,
+        city: typeof row.city === "string" ? row.city : null,
+        countryCode: typeof row.country_code === "string" ? row.country_code : null,
+        profession: typeof row.profession === "string" ? row.profession : null,
+        education: typeof row.education === "string" ? row.education : null,
+      });
+      return {
+        ...row,
+        preferenceFit,
+        matchScore: null,
+        dimensions: {
+          preference: preferenceFit.score,
+          horoscope: "not_calculated",
+          social: "requires_mutual_category_consent",
+          aiCompatibility: "not_calculated",
+          values: "not_calculated",
+        },
+      };
+    }).filter(row => row.preferenceFit.eligible !== false);
     return jsonOk({ matches, limit, offset, hasMore });
   } catch {
     return jsonError(503, "DISCOVERY_UNAVAILABLE", "Match discovery is temporarily unavailable.");
