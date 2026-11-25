@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { transaction } from "@/lib/server/db";
 import { jsonError, jsonOk, clientIp } from "@/lib/server/http";
