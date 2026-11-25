@@ -24,6 +24,14 @@ export async function POST(request: Request, context: { params: Promise<{ member
   }
 
   try {
+    const recent = await query(
+      `SELECT count(*)::int AS count FROM member_report
+        WHERE reporter_user_id = $1 AND created_at > now() - interval '24 hours'`,
+      [viewer.id],
+    );
+    if ((recent.rows[0]?.count ?? 0) >= 5) {
+      return jsonError(429, "REPORT_RATE_LIMITED", "You have reached the daily report limit. Please contact support for urgent safety concerns.");
+    }
     const result = await query(
       `INSERT INTO member_report(reporter_user_id, reported_user_id, category, description)
        SELECT $1, id, $3, $4 FROM app_user WHERE id = $2 AND status = 'active'
