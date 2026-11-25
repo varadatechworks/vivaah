@@ -8,7 +8,8 @@ Premium, privacy-first matrimonial platform. Product requirements and architectu
 2. Install dependencies: `npm install`.
 3. Copy `.env.example` to `.env.local` and configure `DATABASE_URL`, `OTP_PEPPER`, `RESEND_API_KEY` and `AUTH_EMAIL_FROM`.
 4. Apply migrations in order using the instructions in `db/README.md`.
-5. Start the web app: `npm run dev`.
+5. Apply migrations 0001–0003 as described in `db/README.md`.
+6. Start the web app: `npm run dev`.
 
 Useful checks:
 
@@ -36,6 +37,8 @@ The OTP is emailed through Resend and is never returned by the API. Production m
 - `GET|PUT /api/v1/social/share-consent`
 - `GET|POST /api/v1/profile`
 - `GET /api/v1/profile/me`
+- `GET /api/v1/matches` (only active, discoverable profiles with active discovery consent)
+- `POST /api/v1/matches/:memberId/feedback`
 - `GET /api/v1/matches/:memberId/social-overlap?category=pages`
 
 Cookie-authenticated writes require a same-origin Origin header. Responses are no-store. Profile creation enforces an 18+ date-of-birth check. Social overlap requires both members to consent for the exact category, active candidate profile eligibility, and no block in either direction.
