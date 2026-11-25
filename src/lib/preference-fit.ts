@@ -39,6 +39,7 @@ export function evaluatePreferenceFit(
 ): PreferenceFit {
   const matchedFields: PreferenceField[] = [];
   const unknownFields: PreferenceField[] = [];
+  const unknownMustHaveFields: PreferenceField[] = [];
   const mismatchedFields: PreferenceField[] = [];
   let flexibleCompared = 0;
   let flexibleMatched = 0;
@@ -47,6 +48,7 @@ export function evaluatePreferenceFit(
     const actual = candidate[field];
     if (actual === undefined || actual === null || actual === "") {
       unknownFields.push(field);
+      unknownMustHaveFields.push(field);
       continue;
     }
     if (matches(field, actual, expected)) matchedFields.push(field);
@@ -67,6 +69,6 @@ export function evaluatePreferenceFit(
   }
 
   const score = flexibleCompared > 0 ? Math.round((flexibleMatched / flexibleCompared) * 100) : null;
-  const eligible = mismatchedFields.length > 0 ? false : unknownFields.length > 0 ? "unknown" : true;
+  const eligible = mismatchedFields.length > 0 ? false : unknownMustHaveFields.length > 0 ? "unknown" : true;
   return { eligible, score, matchedFields, unknownFields, mismatchedFields };
 }
